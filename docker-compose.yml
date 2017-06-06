@@ -7,7 +7,7 @@ services:
     hostname: cloudant
     network_mode: bridge
   web:
-    image: node:8-alpine    
+    image: markwatsonatx/tutorial-polymer-shop-hoodie:latest
     volumes:
       - ./src/app:/usr/src/app
     working_dir: /usr/src/app

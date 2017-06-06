@@ -1,0 +1,29 @@
+{
+  "name": "shop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "postinstall": "cd public && bower install",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm install && nodemon -L node_modules/hoodie/bin/start.js",
+    "start-hoodie": "hoodie"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bradley-holt/shop.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bradley-holt/shop/issues"
+  },
+  "homepage": "https://github.com/bradley-holt/shop#readme",
+  "dependencies": {
+    "hoodie": "^28.1.1",
+    "nodemon": "^1.11.0"
+  }
+}

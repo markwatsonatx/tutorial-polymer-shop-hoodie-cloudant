@@ -1,0 +1,19 @@
+version: '2'
+services:
+  db:
+    image: ibmcom/cloudant-developer:latest
+    ports:  
+      - "30080:80"
+    hostname: cloudant
+    network_mode: bridge
+  web:
+    image: node:8-alpine    
+    volumes:
+      - ./src/app:/usr/src/app
+    working_dir: /usr/src/app
+    command: npm start
+    ports:
+      - "38080:8080"
+    links:
+      - db
+    network_mode: bridge

@@ -1,0 +1,179 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="hoodie.html">
+
+<dom-module id="shop-cart-data">
+
+  <template>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'shop-cart-data',
+
+      properties: {
+
+        cart: {
+          type: Array,
+          value: function() {
+            return [];
+          },
+          notify: true
+        },
+
+        numItems: {
+          type: Number,
+          computed: '_computeNumItems(cart.splices)',
+          notify: true
+        },
+
+        total: {
+          type: Number,
+          computed: '_computeTotal(cart.splices)',
+          notify: true
+        }
+
+      },
+
+      observers: [
+        "_cartUpdated(cart.splices)"
+      ],
+
+      _cartDoc: {
+        _id: "cart",
+        items: [],
+      },
+
+      ready: function() {
+        var shopCartData = this;
+        // TODO: This approach is necessarily because of hoodiehq/hoodie-client#146 (https://github.com/hoodiehq/hoodie-client/issues/146)
+        hoodie.store.db.__proto__.on("created", function(db) {
+          if ("store" == db.name) {
+            // Listen for PouchDB changes for the "cart" document
+            hoodie.store.db.changes({
+              live: true,
+              include_docs: true,
+              doc_ids: [ shopCartData._cartDoc._id ],
+              return_docs: false
+            }).on("change", function(change) {
+              var doc = change.doc;
+              // Copy document data into cart and _cartDoc
+              shopCartData.cart = doc.items;
+              shopCartData._cartDoc = doc;
+            });
+          }
+        })
+        hoodie.account.hook.after("signout", function() {
+          // Reset cart and _cartDoc
+          shopCartData.cart = [];
+          shopCartData._cartDoc = {
+            _id: "cart"
+          };
+        });
+        hoodie.store.findOrAdd(this._cartDoc).then(function(doc) {
+          if (doc) {
+            shopCartData.cart = doc.items;
+            shopCartData._cartDoc = doc;
+          }
+        });
+      },
+
+      addItem: function(detail) {
+        var i = this._indexOfEntry(detail.item.name, detail.size);
+        if (i !== -1) {
+          detail.quantity += this.cart[i].quantity;
+        }
+        this.setItem(detail);
+      },
+
+      setItem: function(detail) {
+        var i = this._indexOfEntry(detail.item.name, detail.size);
+        if (detail.quantity === 0) {
+          // Remove item from cart when the new quantity is 0.
+          if (i !== -1) {
+            this.splice('cart', i, 1);
+          }
+        } else {
+          // Use Polymer's array mutation methods (`splice`, `push`) so that observers
+          // on `cart.splices` are triggered.
+          if (i !== -1) {
+            this.splice('cart', i, 1, detail);
+          } else {
+            this.push('cart', detail);
+          }
+        }
+      },
+
+      clearCart: function() {
+        this.cart = [];
+      },
+
+      _computeNumItems: function() {
+        if (this.cart) {
+          return this.cart.reduce(function(total, entry) {
+            return total + entry.quantity;
+          }, 0);
+        }
+
+        return 0;
+      },
+
+      _computeTotal: function() {
+        if (this.cart) {
+          return this.cart.reduce(function(total, entry) {
+            return total + entry.quantity * entry.item.price;
+          }, 0);
+        }
+
+        return 0;
+      },
+
+      _indexOfEntry: function(name, size) {
+        if (this.cart) {
+          for (var i = 0; i < this.cart.length; ++i) {
+            var entry = this.cart[i];
+            if (entry.item.name === name && entry.size === size) {
+              return i;
+            }
+          }
+        }
+
+        return -1;
+      },
+
+      _cartUpdated: function() {
+        if (!this._cartDoc._rev) {
+          // Skip if document is not already in Hoodie store
+          return;
+        }
+        var shopCartData = this;
+        hoodie.store.find(this._cartDoc._id).then(function(doc) {
+          // TODO: Compare cart items without using JSON.stringify
+          if (JSON.stringify(shopCartData.cart) != JSON.stringify(doc.items)) {
+            // Update Hoodie store from cart via _cartDoc
+            doc.items = shopCartData.cart;
+            return hoodie.store.update(doc);
+          }
+        }).then(function(doc) {
+          if (doc) {
+            shopCartData._cartDoc = doc;
+          }
+        });
+      }
+
+    });
+
+  </script>
+
+</dom-module>

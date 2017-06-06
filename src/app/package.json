@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/bradley-holt/shop#readme",
   "dependencies": {
+    "bower": "^1.8.0",
     "hoodie": "^28.1.1",
     "nodemon": "^1.11.0"
   }

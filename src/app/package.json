@@ -9,7 +9,7 @@
   "scripts": {
     "postinstall": "cd public && bower install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm install && nodemon -L node_modules/hoodie/bin/start.js",
+    "start": "hoodie",
     "start-hoodie": "hoodie"
   },
   "repository": {

@@ -7,6 +7,7 @@ services:
     hostname: cloudant
     network_mode: bridge
     labels:
+      - "com.exampleup.proxy.name.30080:Cloudant"
       - "com.exampleup.proxy.path.30080:/dashboard.html"
   web:
     image: markwatsonatx/tutorial-polymer-shop-hoodie:latest

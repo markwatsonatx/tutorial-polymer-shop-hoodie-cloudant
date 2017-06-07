@@ -20,3 +20,5 @@ services:
     links:
       - db
     network_mode: bridge
+    labels:
+      - "com.exampleup.proxy.name.38080:Shop"

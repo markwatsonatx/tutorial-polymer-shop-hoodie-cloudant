@@ -1,0 +1,21 @@
+{
+  "editor" : {
+    "hide": false,
+    "srcDir": "src"
+  },
+  "proxy": {
+    "ports": [
+      {
+        "port": 30080,
+        "hide": false,
+        "name": "Cloudant",
+        "path": "/dashboard.html"
+      },
+      {
+        "port": 38080,
+        "hide": false,
+        "name": "Shop"
+      }
+    ]
+  }
+}

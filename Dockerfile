@@ -2,15 +2,14 @@ FROM markwatsonatx/node-alpine
 
 RUN mkdir -p /app
 
-ADD src/app/public /app/public
-ADD src/app/package.json /app/package.json
+COPY src/app/public /app/public
+COPY src/app/package.json /app
 
 WORKDIR /app
 
-RUN apk update
-RUN apk add git
-RUN npm install -g bower
-RUN npm install
+RUN apk add --no-cache git \
+  && npm install -g bower \
+  && npm install
 
 WORKDIR /app/public
 

@@ -8,4 +8,5 @@ if [ ! -d "/usr/src/app/public/bower_components" ]; then
    cp -r /app/public/bower_components /usr/src/app/public/bower_components
 fi
 cd /usr/src/app
-npm start
+npm install -g nodemon
+nodemon -L node_modules/hoodie/bin/start.js

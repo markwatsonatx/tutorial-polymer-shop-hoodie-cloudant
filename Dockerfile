@@ -1,4 +1,4 @@
-FROM markwatsonatx/node-alpine
+FROM node:alpine
 
 RUN mkdir -p /app
 
